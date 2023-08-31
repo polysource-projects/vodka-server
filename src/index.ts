@@ -146,8 +146,6 @@ server.get("/data", async (request, reply) => {
 
 	// TODO: fetch data
 	const user = {
-		firstName: "John",
-		lastName: "Doe",
 		email,
 	};
 
