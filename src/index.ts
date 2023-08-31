@@ -6,11 +6,11 @@ import type { FastifyCookieOptions } from '@fastify/cookie'
 import cookie from '@fastify/cookie';
 
 import { v4 as uuidv4 } from 'uuid';
-import jwt from 'jsonwebtoken';
 
 import { sendConfirmationCode } from './mail';
 import { getRedisClient } from './redis';
 import { generateRandomCode, hash } from './util';
+import { invalidateVodkaSessionToken, signVodkaSessionToken, whitelistSessionToken } from './session-tokens';
 
 const server = fastify();
 
@@ -85,6 +85,47 @@ server.post('/auth/answer', async (request, reply) => {
         return void reply.code(401).send();
     }
 
+    const vodkaSessionToken = await signVodkaSessionToken({
+        email,
+        tokenType: 'vodka'
+    });
+
+    await whitelistSessionToken(vodkaSessionToken);
+
+    reply.setCookie('sessionId', vodkaSessionToken, {
+        path: '/',
+        httpOnly: true,
+        sameSite: 'strict',
+        secure: true
+    });
+
+    const dummyUserData = {
+        firstName: 'John',
+        lastName: 'Doe',
+        email: 'john.doe@epfl.ch'
+    }
+
+    reply.send(dummyUserData);
+});
+
+server.post('/auth/logout', async (request, reply) => {
+
+    const sessionId = request.cookies?.sessionId;
+
+    if (!sessionId) {
+        return void reply.code(400).send();
+    }
+    
+    await invalidateVodkaSessionToken(sessionId);
+
+    reply.clearCookie('sessionId', {
+        path: '/',
+        httpOnly: true,
+        sameSite: 'strict',
+        secure: true
+    });
+
+    reply.send();
 });
 
 server.listen({
