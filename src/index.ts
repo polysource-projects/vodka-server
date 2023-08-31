@@ -17,8 +17,10 @@ import {
 	whitelistSessionToken,
 } from "./session-tokens";
 
-import { promises } from "fs";
-const readFile = promises.readFile;
+import { readFileSync } from "fs";
+
+// We can afford to block the event loop here as it's only done once at startup
+const websites = JSON.parse(readFileSync("websites.json", "utf-8"));
 
 const server = fastify();
 
@@ -153,7 +155,6 @@ server.get("/data", async (request, reply) => {
 	let website = null;
 
 	if (domain) {
-		const websites = JSON.parse(await readFile("websites.json", "utf-8"));
 		website = websites.find((w: any) => w.domain === domain) || null;
 	}
 
