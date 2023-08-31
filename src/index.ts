@@ -76,6 +76,7 @@ server.post("/auth/ask", async (request, reply) => {
 		httpOnly: true,
 		sameSite: process.env.NODE_ENV === "development" ? "none" : "strict",
 		secure: true,
+		maxAge: 60 * 10, // 10 minutes
 	});
 	reply.code(201).send("OK");
 });
@@ -96,7 +97,7 @@ server.post("/auth/answer", async (request, reply) => {
 		return void reply.code(401).send();
 	}
 
-	const vodkaSessionToken = await signVodkaSessionToken({
+	const vodkaSessionToken = signVodkaSessionToken({
 		email,
 		tokenType: "vodka",
 	});
@@ -108,6 +109,7 @@ server.post("/auth/answer", async (request, reply) => {
 		httpOnly: true,
 		sameSite: process.env.NODE_ENV === "development" ? "none" : "strict",
 		secure: true,
+		maxAge: 60 * 60 * 24 * 7, // 1 week
 	});
 
 	reply.send("OK");
@@ -117,7 +119,7 @@ server.post("/auth/logout", async (request, reply) => {
 	const sessionId = request.cookies?.sessionId;
 
 	if (!sessionId) {
-		return void reply.code(400).send();
+		return void reply.code(401).send();
 	}
 
 	await invalidateVodkaSessionToken(sessionId);
