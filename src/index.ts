@@ -12,8 +12,12 @@ import { sendConfirmationCode } from "./mail";
 import { getRedisClient } from "./redis";
 import { generateRandomCode, hash } from "./util";
 import {
+    VodkaUserData,
+	WebsiteData,
 	decodeSessionToken,
 	invalidateVodkaSessionToken,
+	linkExternalSessionTokenToVodkaSessionToken,
+	signExternalSessionToken,
 	signVodkaSessionToken,
 	whitelistSessionToken,
 } from "./session-tokens";
@@ -21,7 +25,7 @@ import {
 import { readFileSync } from "fs";
 
 // We can afford to block the event loop here as it's only done once at startup
-const websites = JSON.parse(readFileSync("websites.json", "utf-8"));
+const websites = JSON.parse(readFileSync("websites.json", "utf-8")) as WebsiteData[];
 
 const server = fastify();
 
@@ -153,20 +157,35 @@ server.get("/data", async (request, reply) => {
 	const email = decodedSessionToken.email;
 
 	// TODO: fetch data
-	const user = {
+	const user: VodkaUserData = {
+        firstname: "John",
+        lastname: "Doe",
 		email,
+        isStudent: true
 	};
 
 	const domain = (request.query as DataQuery)?.domain;
 	let website = null;
+    let token = null;
 
 	if (domain) {
 		website = websites.find((w: any) => w.domain === domain) || null;
+
+       token = signExternalSessionToken({
+            email,
+            tokenType: "external",
+            user,
+            domain
+        })
+
+        await whitelistSessionToken(token);
+        await linkExternalSessionTokenToVodkaSessionToken(sessionId, token);
 	}
 
 	reply.send({
 		user,
 		website,
+        token
 	});
 });
 

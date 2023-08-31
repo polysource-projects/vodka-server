@@ -6,7 +6,12 @@ import { getRedisClient } from "./redis";
 export const privateKey = readFileSync("keys/private.key", "utf-8");
 export const publicKey = readFileSync("keys/public.key.pub", "utf-8");
 
-interface VodkaUserData {
+export interface WebsiteData {
+	name: string;
+	domain: string;
+}
+
+export interface VodkaUserData {
 	email: string;
 	firstname: string;
 	lastname: string;
@@ -20,7 +25,7 @@ interface VodkaSessionTokenData {
 
 interface ExternalSessionTokenData {
 	email: string;
-	website: string;
+	domain: string;
 	user: VodkaUserData;
 	tokenType: "external";
 }
@@ -47,12 +52,12 @@ export const invalidateVodkaSessionToken = async (token: string) => {
 	const redisClient = await getRedisClient();
 	await redisClient.del(`session_${tokenHash}`);
 
-	const externalSessionTokens = await redisClient.sMembers(
+	const externalSessionTokensHash = await redisClient.sMembers(
 		`session_${tokenHash}_external`,
 	);
 
-	for (const externalSessionToken of externalSessionTokens) {
-		await redisClient.del(`session_${hash(externalSessionToken)}`);
+	for (const externalSessionTokenHash of externalSessionTokensHash) {
+		await redisClient.del(`session_${externalSessionTokenHash}`);
 	}
 };
 
@@ -83,11 +88,7 @@ export const decodeSessionToken = async (
 // this function creates a new external session token, used to authenticate users on external websites
 // this session token is a JWT and contains all the user data
 export const signExternalSessionToken = (data: ExternalSessionTokenData) => {
-	try {
-		return jwt.sign(data, privateKey, { algorithm: "RS256" });
-	} catch (e) {
-		return null;
-	}
+    return jwt.sign(data, privateKey, { algorithm: "RS256" });
 };
 
 // this function links an external session token to a vodka session token
@@ -101,6 +102,6 @@ export const linkExternalSessionTokenToVodkaSessionToken = async (
 	const redisClient = await getRedisClient();
 	await redisClient.sAdd(
 		`session_${vodkaSessionTokenHash}_external`,
-		externalSessionToken,
+		hash(externalSessionToken),
 	);
 };

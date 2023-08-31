@@ -71,7 +71,8 @@ POST /data?domain=www.google.com
 ```json
 {
     "user": User,
-    "website": Website
+    "website": Website,
+    "token": ExternalJWT
 }
 ```
 
