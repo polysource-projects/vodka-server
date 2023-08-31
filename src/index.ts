@@ -148,7 +148,7 @@ server.get("/data", async (request, reply) => {
 	const user = {
 		firstName: "John",
 		lastName: "Doe",
-		email: "john.doe@epfl.ch",
+		email,
 	};
 
 	const domain = (request.query as DataQuery)?.domain;
