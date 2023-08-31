@@ -10,7 +10,10 @@ import { v4 as uuidv4 } from 'uuid';
 import { sendConfirmationCode } from './mail';
 import { getRedisClient } from './redis';
 import { generateRandomCode, hash } from './util';
-import { invalidateVodkaSessionToken, signVodkaSessionToken, whitelistSessionToken } from './session-tokens';
+import { decodeSessionToken, invalidateVodkaSessionToken, signVodkaSessionToken, whitelistSessionToken } from './session-tokens';
+
+import { promises } from 'fs';
+const readFile = promises.readFile;
 
 const server = fastify();
 
@@ -126,6 +129,46 @@ server.post('/auth/logout', async (request, reply) => {
     });
 
     reply.send();
+});
+
+interface DataQuery {
+    domain?: string;
+}
+
+server.get('/data', async (request, reply) => {
+
+    const sessionId = request.cookies?.sessionId;
+
+    if (!sessionId) {
+        return void reply.code(400).send();
+    }
+
+    const decodedSessionToken = await decodeSessionToken(sessionId);
+    if (!decodedSessionToken) {
+        return void reply.code(401).send();
+    }
+
+    const email = decodedSessionToken.email;
+
+    // TODO: fetch data
+    const userData = {
+        firstName: 'John',
+        lastName: 'Doe',
+        email: 'john.doe@epfl.ch'
+    }
+
+    const domain = (request.query as DataQuery)?.domain;
+    let domainData = null;
+
+    if (domain) {
+        const domains = JSON.parse(await readFile('domains.json', 'utf-8'));
+        domainData = domains.find((d: any) => d.domain === domain) || null;
+    }
+
+    reply.send({
+        userData,
+        domainData
+    });
 });
 
 server.listen({
