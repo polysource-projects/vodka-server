@@ -3,7 +3,6 @@ import { readFileSync } from 'fs';
 import { hash } from './util';
 import { getRedisClient } from './redis';
 
-const privateKey = readFileSync('jwtRS256.key', 'utf-8');
 export const publicKey = readFileSync('jwtRS256.key.pub', 'utf-8');
 
 interface VodkaUserData {
@@ -29,7 +28,7 @@ interface ExternalSessionTokenData {
 // a vodka session token only contains an email address
 export const signVodkaSessionToken = (data: VodkaSessionTokenData) => {
 
-    return jwt.sign(data, privateKey, { algorithm: 'RS256' });
+    return jwt.sign(data, process.env.JWT_PRIVATE_KEY, { algorithm: 'RS256' });
 
 }
 
@@ -87,7 +86,7 @@ export const decodeSessionToken = async (token: string): Promise<VodkaSessionTok
 export const signExternalSessionToken = (data: ExternalSessionTokenData) => {
     
     try {
-        return jwt.sign(data, privateKey, { algorithm: 'RS256' });
+        return jwt.sign(data, process.env.JWT_PRIVATE_KEY, { algorithm: 'RS256' });
     } catch (e) {
         return null;
     }
