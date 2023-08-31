@@ -67,7 +67,7 @@ server.post('/auth/ask', async (request, reply) => {
         sameSite: 'strict',
         secure: true
     });
-    reply.send();
+    reply.code(201).send('OK');
 
 });
 
@@ -102,13 +102,7 @@ server.post('/auth/answer', async (request, reply) => {
         secure: true
     });
 
-    const dummyUserData = {
-        firstName: 'John',
-        lastName: 'Doe',
-        email: 'john.doe@epfl.ch'
-    }
-
-    reply.send(dummyUserData);
+    reply.send('OK');
 });
 
 server.post('/auth/logout', async (request, reply) => {
@@ -128,7 +122,7 @@ server.post('/auth/logout', async (request, reply) => {
         secure: true
     });
 
-    reply.send();
+    reply.send('OK');
 });
 
 interface DataQuery {
@@ -158,16 +152,16 @@ server.get('/data', async (request, reply) => {
     }
 
     const domain = (request.query as DataQuery)?.domain;
-    let domainData = null;
+    let websiteData = null;
 
     if (domain) {
-        const domains = JSON.parse(await readFile('domains.json', 'utf-8'));
-        domainData = domains.find((d: any) => d.domain === domain) || null;
+        const websites = JSON.parse(await readFile('websites.json', 'utf-8'));
+        websiteData = websites.find((w: any) => w.domain === domain) || null;
     }
 
     reply.send({
         userData,
-        domainData
+        websiteData
     });
 });
 
