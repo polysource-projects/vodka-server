@@ -32,6 +32,7 @@ server.register(cookie, {
 
 server.register(cors, {
 	origin: true,
+	credentials: true,
 });
 
 interface AskBody {
@@ -73,7 +74,7 @@ server.post("/auth/ask", async (request, reply) => {
 	reply.setCookie("questionId", cookieQuestionId, {
 		path: "/",
 		httpOnly: true,
-		sameSite: "strict",
+		sameSite: process.env.NODE_ENV === "development" ? "none" : "strict",
 		secure: true,
 	});
 	reply.code(201).send("OK");
@@ -105,7 +106,7 @@ server.post("/auth/answer", async (request, reply) => {
 	reply.setCookie("sessionId", vodkaSessionToken, {
 		path: "/",
 		httpOnly: true,
-		sameSite: "strict",
+		sameSite: process.env.NODE_ENV === "development" ? "none" : "strict",
 		secure: true,
 	});
 
@@ -125,7 +126,7 @@ server.post("/auth/logout", async (request, reply) => {
 		path: "/",
 		httpOnly: true,
 		sameSite: "strict",
-		secure: true,
+		// secure: true,
 	});
 
 	reply.send("OK");
@@ -170,7 +171,7 @@ server.get("/data", async (request, reply) => {
 server.listen(
 	{
 		port: process.env.PORT ?? 8000,
-		host: "0.0.0.0",
+		host: "127.0.0.1",
 	},
 	(err, address) => {
 		if (err) {
