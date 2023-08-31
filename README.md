@@ -9,9 +9,10 @@
 ```http
 POST /auth/ask
 ```
+
 ```json
 {
-    "email": "john.doe@epfl.ch"
+	"email": "john.doe@epfl.ch"
 }
 ```
 
@@ -20,6 +21,7 @@ POST /auth/ask
 ```http
 Set-Cookie: questionId
 ```
+
 ```json
 OK
 ```
@@ -31,9 +33,10 @@ OK
 ```http
 POST /auth/answer
 ```
+
 ```json
 {
-    "answer": "123456"
+	"answer": "123456"
 }
 ```
 
@@ -42,6 +45,7 @@ POST /auth/answer
 ```http
 Set-Cookie: sessionId
 ```
+
 ```json
 OK
 ```
@@ -53,13 +57,17 @@ OK
 ```http
 POST /data?domain=www.google.com
 ```
+
 ```json
+
 ```
 
 #### Request - 200 OK
 
 ```http
+
 ```
+
 ```json
 {
     "user": User,
@@ -74,13 +82,17 @@ POST /data?domain=www.google.com
 ```http
 POST /auth/logout
 ```
+
 ```json
+
 ```
 
 #### Request - 200 OK
 
 ```http
+
 ```
+
 ```json
 OK
 ```
