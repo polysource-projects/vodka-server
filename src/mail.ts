@@ -32,7 +32,7 @@ export const sendConfirmationCode = async (email: string, code: string) => {
 
 	const info = await sendMail(
 		email,
-		`${code} is your Vodka confirmation code.`,
+		`${code} is your Vodka verification code.`,
 		updatedHtmlPage,
 	);
 
