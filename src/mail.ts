@@ -30,7 +30,11 @@ export const sendConfirmationCode = async (email: string, code: string) => {
 
 	const updatedHtmlPage = htmlPage.replace("{{code}}", code);
 
-	const info = await sendMail(email, "Confirmation code", updatedHtmlPage);
+	const info = await sendMail(
+		email,
+		`${code} is your Vodka confirmation code.`,
+		updatedHtmlPage,
+	);
 
 	return info;
 };
