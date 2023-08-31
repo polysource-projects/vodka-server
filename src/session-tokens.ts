@@ -3,6 +3,7 @@ import { readFileSync } from "fs";
 import { hash } from "./util";
 import { getRedisClient } from "./redis";
 
+export const privateKey = readFileSync("keys/private.key", "utf-8");
 export const publicKey = readFileSync("keys/public.key.pub", "utf-8");
 
 interface VodkaUserData {
@@ -27,7 +28,7 @@ interface ExternalSessionTokenData {
 // this function creates a new vodka session token, used to authenticate users on vodka
 // a vodka session token only contains an email address
 export const signVodkaSessionToken = (data: VodkaSessionTokenData) => {
-	return jwt.sign(data, process.env.JWT_PRIVATE_KEY, { algorithm: "RS256" });
+	return jwt.sign(data, privateKey, { algorithm: "RS256" });
 };
 
 // this is used to add the signed session token to the redis whitelist
@@ -83,7 +84,7 @@ export const decodeSessionToken = async (
 // this session token is a JWT and contains all the user data
 export const signExternalSessionToken = (data: ExternalSessionTokenData) => {
 	try {
-		return jwt.sign(data, process.env.JWT_PRIVATE_KEY, { algorithm: "RS256" });
+		return jwt.sign(data, privateKey, { algorithm: "RS256" });
 	} catch (e) {
 		return null;
 	}
