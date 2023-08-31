@@ -7,6 +7,5 @@ node_modules
 # Dist
 dist
 
-# Private key
-*.key*
-!jwtRS256.key.pub
+# All keys
+keys

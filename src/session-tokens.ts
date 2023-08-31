@@ -3,7 +3,7 @@ import { readFileSync } from "fs";
 import { hash } from "./util";
 import { getRedisClient } from "./redis";
 
-export const publicKey = readFileSync("jwtRS256.key.pub", "utf-8");
+export const publicKey = readFileSync("keys/public.key.pub", "utf-8");
 
 interface VodkaUserData {
 	email: string;
@@ -47,7 +47,7 @@ export const invalidateVodkaSessionToken = async (token: string) => {
 	await redisClient.del(`session_${tokenHash}`);
 
 	const externalSessionTokens = await redisClient.sMembers(
-		`session_${tokenHash}_external`
+		`session_${tokenHash}_external`,
 	);
 
 	for (const externalSessionToken of externalSessionTokens) {
@@ -58,7 +58,7 @@ export const invalidateVodkaSessionToken = async (token: string) => {
 // this function verifies if a session token is signed AND whitelisted
 // THIS WORKS FOR BOTH VODKA AND EXTERNAL SESSION TOKENS
 export const decodeSessionToken = async (
-	token: string
+	token: string,
 ): Promise<VodkaSessionTokenData | ExternalSessionTokenData | false> => {
 	const tokenHash = hash(token);
 
@@ -93,13 +93,13 @@ export const signExternalSessionToken = (data: ExternalSessionTokenData) => {
 // this is useful so when a user logs out of vodka, we can un-whitelist all the external session tokens
 export const linkExternalSessionTokenToVodkaSessionToken = async (
 	vodkaSessionToken: string,
-	externalSessionToken: string
+	externalSessionToken: string,
 ) => {
 	const vodkaSessionTokenHash = hash(vodkaSessionToken);
 
 	const redisClient = await getRedisClient();
 	await redisClient.sAdd(
 		`session_${vodkaSessionTokenHash}_external`,
-		externalSessionToken
+		externalSessionToken,
 	);
 };
