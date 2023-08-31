@@ -52,15 +52,12 @@ interface AnswerBody {
 server.post("/auth/ask", async (request, reply) => {
 	// TODO: check for email validity
 	const email = (request.body as AskBody)?.email;
-	console.log("hllo", email, request.body);
 	if (!email || !email.endsWith("@epfl.ch")) {
-		console.log("ohno");
 		return void reply.code(400).send();
 	}
 
 	// TODO: check ratelimits
 
-	console.log("hi0");
 	// generate confirmation code and question ID
 	const random6Digits = generateRandomCode();
 	const cookieQuestionId = uuidv4();
@@ -69,10 +66,8 @@ server.post("/auth/ask", async (request, reply) => {
 	// store hash(code + QUESTION_ID) <--> email
 	const redisClient = await getRedisClient();
 	await redisClient.set(cookieQuestionIdHash, email);
-	console.log("hi");
 	// send confirmation code
 	sendConfirmationCode(email, random6Digits);
-	console.log("hi2");
 
 	// send cookie with question id
 	reply.setCookie("questionId", cookieQuestionId, {
@@ -82,7 +77,6 @@ server.post("/auth/ask", async (request, reply) => {
 		secure: true,
 	});
 	reply.code(201).send("OK");
-	console.log("hi3");
 });
 
 server.post("/auth/answer", async (request, reply) => {
