@@ -2,16 +2,29 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 import fastify from 'fastify';
-import { sendConfirmationCode } from './mail';
+import type { FastifyCookieOptions } from '@fastify/cookie'
+import cookie from '@fastify/cookie';
 
 import { v4 as uuidv4 } from 'uuid';
-import { generateRandomCode, hash } from './util';
+import jwt from 'jsonwebtoken';
+
+import { sendConfirmationCode } from './mail';
 import { getRedisClient } from './redis';
+import { generateRandomCode, hash } from './util';
 
 const server = fastify();
 
+server.register(cookie, {
+    secret: process.env.COOKIE_SECRET,
+    parseOptions: {}
+} as FastifyCookieOptions);
+
 interface AskBody {
     email: string;
+}
+
+interface AnswerBody {
+    answer: string;
 }
 
 /**
@@ -45,8 +58,32 @@ server.post('/auth/ask', async (request, reply) => {
     sendConfirmationCode(email, random6Digits);
     
     // send cookie with question id
-    reply.header('Set-Cookie', `questionId=${cookieQuestionId}; Path=/; HttpOnly; Secure; SameSite=Strict; Max-Age=300`);
+    reply.setCookie('questionId', cookieQuestionId, {
+        path: '/',
+        httpOnly: true,
+        sameSite: 'strict',
+        secure: true
+    });
     reply.send();
+
+});
+
+server.post('/auth/answer', async (request, reply) => {
+
+    const questionId = request.cookies?.questionId;
+    const answer = (request.body as AnswerBody)?.answer;
+
+    if (!questionId || !answer) {
+        return void reply.code(400).send();
+    }
+
+    const cookieQuestionIdHash = hash(answer + questionId);
+
+    const redisClient = await getRedisClient();
+    const email = await redisClient.get(cookieQuestionIdHash);
+    if (!email || !email.endsWith('@epfl.ch')) {
+        return void reply.code(401).send();
+    }
 
 });
 
