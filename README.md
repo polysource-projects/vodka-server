@@ -62,8 +62,8 @@ POST /data?domain=www.google.com
 ```
 ```json
 {
-    "userData": User,
-    "websiteData": Website
+    "user": User,
+    "website": Website
 }
 ```
 

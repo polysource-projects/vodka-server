@@ -145,23 +145,23 @@ server.get('/data', async (request, reply) => {
     const email = decodedSessionToken.email;
 
     // TODO: fetch data
-    const userData = {
+    const user = {
         firstName: 'John',
         lastName: 'Doe',
         email: 'john.doe@epfl.ch'
     }
 
     const domain = (request.query as DataQuery)?.domain;
-    let websiteData = null;
+    let website = null;
 
     if (domain) {
         const websites = JSON.parse(await readFile('websites.json', 'utf-8'));
-        websiteData = websites.find((w: any) => w.domain === domain) || null;
+        website = websites.find((w: any) => w.domain === domain) || null;
     }
 
     reply.send({
-        userData,
-        websiteData
+        user,
+        website
     });
 });
 
