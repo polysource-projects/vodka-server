@@ -12,7 +12,7 @@ import { sendConfirmationCode } from "./mail";
 import { getRedisClient } from "./redis";
 import { generateRandomCode, hash } from "./util";
 import {
-    VodkaUserData,
+	VodkaUserData,
 	WebsiteData,
 	decodeSessionToken,
 	invalidateVodkaSessionToken,
@@ -158,34 +158,34 @@ server.get("/data", async (request, reply) => {
 
 	// TODO: fetch data
 	const user: VodkaUserData = {
-        firstname: "John",
-        lastname: "Doe",
+		firstname: "John",
+		lastname: "Doe",
 		email,
-        isStudent: true
+		isStudent: true
 	};
 
 	const domain = (request.query as DataQuery)?.domain;
 	let website = null;
-    let token = null;
+	let token = null;
 
 	if (domain) {
 		website = websites.find((w: any) => w.domain === domain) || null;
 
-       token = signExternalSessionToken({
-            email,
-            tokenType: "external",
-            user,
-            domain
-        })
+		token = signExternalSessionToken({
+			email,
+			tokenType: "external",
+			user,
+			domain
+		})
 
-        await whitelistSessionToken(token);
-        await linkExternalSessionTokenToVodkaSessionToken(sessionId, token);
+		await whitelistSessionToken(token);
+		await linkExternalSessionTokenToVodkaSessionToken(sessionId, token);
 	}
 
 	reply.send({
 		user,
 		website,
-        token
+		token
 	});
 });
 

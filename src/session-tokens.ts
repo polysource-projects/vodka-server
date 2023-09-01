@@ -88,7 +88,7 @@ export const decodeSessionToken = async (
 // this function creates a new external session token, used to authenticate users on external websites
 // this session token is a JWT and contains all the user data
 export const signExternalSessionToken = (data: ExternalSessionTokenData) => {
-    return jwt.sign(data, privateKey, { algorithm: "RS256" });
+	return jwt.sign(data, privateKey, { algorithm: "RS256" });
 };
 
 // this function links an external session token to a vodka session token
