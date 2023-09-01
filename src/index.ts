@@ -1,10 +1,13 @@
 import dotenv from "dotenv";
 dotenv.config();
 
+import path from "path";
+
 import fastify from "fastify";
 import type { FastifyCookieOptions } from "@fastify/cookie";
 import cookie from "@fastify/cookie";
 import cors from "@fastify/cors";
+import fstatic from "@fastify/static";
 
 import { v4 as uuidv4 } from "uuid";
 
@@ -26,9 +29,11 @@ import {
 import { readFileSync } from "fs";
 
 // We can afford to block the event loop here as it's only done once at startup
-const websites = JSON.parse(readFileSync("websites.json", "utf-8")) as WebsiteData[];
+const websites = JSON.parse(
+	readFileSync("websites.json", "utf-8"),
+) as WebsiteData[];
 
-const server = fastify();
+const server = fastify({ logger: process.env.NODE_ENV === "development" });
 
 server.register(cookie, {
 	secret: process.env.COOKIE_SECRET,
@@ -38,6 +43,10 @@ server.register(cookie, {
 server.register(cors, {
 	origin: true,
 	credentials: true,
+});
+server.register(fstatic, {
+	root: path.join(__dirname, "../public"),
+	prefix: "/public/",
 });
 
 interface AskBody {
@@ -162,7 +171,7 @@ server.get("/data", async (request, reply) => {
 		firstname: "John",
 		lastname: "Doe",
 		email,
-		isStudent: true
+		isStudent: true,
 	};
 
 	const domain = (request.query as DataQuery)?.domain;
@@ -176,8 +185,8 @@ server.get("/data", async (request, reply) => {
 			email,
 			tokenType: "external",
 			user,
-			domain
-		})
+			domain,
+		});
 
 		await whitelistSessionToken(token);
 		await linkExternalSessionTokenToVodkaSessionToken(sessionId, token);
@@ -186,14 +195,12 @@ server.get("/data", async (request, reply) => {
 	reply.send({
 		user,
 		website,
-		token
+		token,
 	});
 });
 
-server.get('/public-key', async (request, reply) => {
-
+server.get("/public-key", async (request, reply) => {
 	reply.send(publicKey);
-
 });
 
 server.listen(

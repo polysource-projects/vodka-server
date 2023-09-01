@@ -9,3 +9,4 @@ dist
 
 # All keys
 keys
+public/*.key*
