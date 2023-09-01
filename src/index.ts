@@ -11,8 +11,6 @@ import infoRouter from "./routes/info.router";
 
 import { publicKey } from "./helpers/keyring";
 
-// We can afford to block the event loop here as it's only done once at startup
-
 const server = fastify({ logger: process.env.NODE_ENV === "development" });
 
 server.register(cookie, {
