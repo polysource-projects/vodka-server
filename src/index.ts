@@ -199,7 +199,7 @@ server.get('/public-key', async (request, reply) => {
 server.listen(
 	{
 		port: process.env.PORT ?? 8000,
-		host: "127.0.0.1",
+		host: "0.0.0.0",
 	},
 	(err, address) => {
 		if (err) {
