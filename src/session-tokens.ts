@@ -36,7 +36,7 @@ interface MessageTokenData {
 
 // this function creates a new vodka session token, used to authenticate users on vodka
 // a vodka session token only contains an email address
-export const signSessionToken = (data: SessionTokenData) => {
+export const signJWT = (data: SessionTokenData) => {
 	return jwt.sign(data, privateKey, { algorithm: "RS256" });
 };
 

@@ -17,4 +17,10 @@ export default async function authRouter(fastify: FastifyInstance) {
 		schema: answerSchema,
 		handler: controllers.answer,
 	});
+
+	fastify.route({
+		method: "POST",
+		url: "/logout",
+		handler: controllers.logout,
+	});
 }

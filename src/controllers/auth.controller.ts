@@ -6,6 +6,7 @@ import {
 	Mail,
 	generateVerificationCode,
 	generateQuestionId,
+	Keyring,
 } from "../helpers";
 
 export const ask: Handler<AskBody> = async (request, reply) => {
@@ -17,11 +18,19 @@ export const ask: Handler<AskBody> = async (request, reply) => {
 	const isEPFL = isValid && email.endsWith("@epfl.ch");
 
 	if (!isValid) {
-		return void reply.code(400).send({ message: "Invalid email" });
+		return void reply
+			.code(400)
+			.send
+			// { message: "Invalid email" }
+			();
 	}
 
 	if (!isEPFL) {
-		return void reply.code(400).send({ message: "Not an EPFL email" });
+		return void reply
+			.code(400)
+			.send
+			// { message: "Not an EPFL email" }
+			();
 	}
 
 	//TODO Manage ratelimits
@@ -45,7 +54,7 @@ export const ask: Handler<AskBody> = async (request, reply) => {
 		maxAge: 60 * 10, // 10 minutes
 	});
 
-	reply.code(201).send({ message: "OK" });
+	reply.code(201).send("OK");
 };
 
 export const answer: Handler<AnswerBody> = async (request, reply) => {
@@ -56,5 +65,33 @@ export const answer: Handler<AnswerBody> = async (request, reply) => {
 		return void reply.code(400).send();
 	}
 
-	const valid = await Redis.checkAnswer(answer, questionId);
+	const email = await Redis.checkAnswer(answer, questionId);
+
+	if (!email) {
+		return void reply.code(401).send();
+	}
+
+	const sessionToken = await Keyring.createSession(email);
+
+	reply.setCookie("sessionId", sessionToken, {
+		path: "/",
+		httpOnly: true,
+		sameSite: process.env.NODE_ENV === "development" ? "none" : "strict",
+		secure: true,
+		maxAge: 60 * 60 * 24 * 7, // 7 days
+	});
+
+	reply.code(200).send("OK");
+};
+
+export const logout: Handler = async (request, reply) => {
+	const sessionId = request.cookies?.sessionId;
+
+	if (!sessionId) {
+		return void reply.code(401).send();
+	}
+
+	await Redis.deleteSession(sessionId);
+
+	reply.clearCookie("sessionId").code(200).send("OK");
 };

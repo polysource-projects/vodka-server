@@ -19,7 +19,7 @@ import {
 	linkMessageTokenToSessionToken,
 	publicKey,
 	signMessageToken,
-	signSessionToken,
+	signJWT,
 	rememberSessionToken,
 } from "./session-tokens";
 
@@ -104,7 +104,7 @@ server.post("/auth/answer", async (request, reply) => {
 		return void reply.code(401).send();
 	}
 
-	const sessionToken = signSessionToken({
+	const sessionToken = signJWT({
 		sub: email,
 		type: "session",
 	});
