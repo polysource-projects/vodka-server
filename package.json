@@ -7,7 +7,7 @@
 		"test": "echo \"Error: no test specified\" && exit 1",
 		"build": "tsc",
 		"start": "node dist/index.js",
-		"generate-keys": "ssh-keygen -t rsa -b 4096 -m PEM -f keys/private.key && openssl rsa -in keys/private.key -pubout -outform PEM -out keys/public.key.pub && echo 'Vodka keys generated!'"
+		"generate-keys": "ssh-keygen -t rsa -b 4096 -m PEM -f keys/vodka.key && openssl rsa -in keys/vodka.key -pubout -outform PEM -out keys/vodka.key.pub && echo 'Vodka keys generated!'"
 	},
 	"keywords": [],
 	"author": "",

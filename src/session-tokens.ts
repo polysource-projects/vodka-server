@@ -3,8 +3,8 @@ import { readFileSync } from "fs";
 import { hash } from "./util";
 import { getRedisClient } from "./redis";
 
-export const privateKey = readFileSync("keys/private.key", "utf-8");
-export const publicKey = readFileSync("keys/public.key.pub", "utf-8");
+export const privateKey = readFileSync("keys/vodka.key", "utf-8");
+export const publicKey = readFileSync("keys/vodka.key.pub", "utf-8");
 
 export interface WebsiteData {
 	name: string;
