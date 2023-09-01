@@ -175,10 +175,9 @@ server.get("/data", async (request, reply) => {
 		website = websites.find((w: any) => w.domain === domain) || null;
 
 		token = signExternalSessionToken({
-			email,
-			tokenType: "external",
+			sub: email,
+			target: domain,
 			user,
-			domain,
 		});
 
 		await whitelistSessionToken(token);

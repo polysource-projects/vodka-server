@@ -13,9 +13,9 @@ export interface WebsiteData {
 
 export interface VodkaUserData {
 	email: string;
-	firstname: string;
-	lastname: string;
-	isStudent: boolean;
+	firstname?: string;
+	lastname?: string;
+	isStudent?: boolean;
 }
 
 interface VodkaSessionTokenData {
@@ -24,10 +24,12 @@ interface VodkaSessionTokenData {
 }
 
 interface ExternalSessionTokenData {
-	email: string;
-	domain: string;
+	// Email
+	sub: string;
+	// Domain
+	target: string;
+	// User data
 	user: VodkaUserData;
-	tokenType: "external";
 }
 
 // this function creates a new vodka session token, used to authenticate users on vodka
