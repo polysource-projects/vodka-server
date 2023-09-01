@@ -1,13 +1,10 @@
 import dotenv from "dotenv";
 dotenv.config();
 
-import path from "path";
-
 import fastify from "fastify";
 import type { FastifyCookieOptions } from "@fastify/cookie";
 import cookie from "@fastify/cookie";
 import cors from "@fastify/cors";
-import fstatic from "@fastify/static";
 
 import { v4 as uuidv4 } from "uuid";
 
@@ -43,10 +40,6 @@ server.register(cookie, {
 server.register(cors, {
 	origin: true,
 	credentials: true,
-});
-server.register(fstatic, {
-	root: path.join(__dirname, "../public"),
-	prefix: "/public/",
 });
 
 interface AskBody {

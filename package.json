@@ -7,7 +7,7 @@
 		"test": "echo \"Error: no test specified\" && exit 1",
 		"build": "tsc",
 		"start": "node dist/index.js",
-		"generate-keys": "ssh-keygen -t rsa -b 4096 -m PEM -f keys/vodka.key && openssl rsa -in keys/vodka.key -pubout -outform PEM -out keys/vodka.key.pub && cp keys/vodka.key.pub public/vodka.key.pub && echo 'Vodka keys generated!'"
+		"generate-keys": "ssh-keygen -t rsa -b 4096 -m PEM -f keys/vodka.key && openssl rsa -in keys/vodka.key -pubout -outform PEM -out keys/vodka.key.pub && echo 'Vodka keys generated!'"
 	},
 	"keywords": [],
 	"author": "",
@@ -27,7 +27,6 @@
 	"dependencies": {
 		"@fastify/cookie": "^9.0.4",
 		"@fastify/cors": "^8.3.0",
-		"@fastify/static": "^6.10.2",
 		"dotenv": "^16.3.1",
 		"fastify": "^4.22.0",
 		"jsonwebtoken": "^9.0.2",

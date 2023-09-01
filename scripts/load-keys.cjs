@@ -10,6 +10,4 @@ if (!publicKey || !privateKey) {
 }
 
 fs.writeFileSync(path.join(__dirname, "../keys/vodka.key"), privateKey);
-
 fs.writeFileSync(path.join(__dirname, "../keys/vodka.key.pub"), publicKey);
-fs.writeFileSync(path.join(__dirname, "../public/vodka.key.pub"), publicKey);
