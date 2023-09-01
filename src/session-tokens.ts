@@ -18,12 +18,14 @@ export interface VodkaUserData {
 	isStudent?: boolean;
 }
 
-interface VodkaSessionTokenData {
-	email: string;
-	tokenType: "vodka";
+interface SessionTokenData {
+	// Email
+	sub: string;
+	// Token type
+	type: "session";
 }
 
-interface ExternalSessionTokenData {
+interface MessageTokenData {
 	// Email
 	sub: string;
 	// Domain
@@ -34,14 +36,14 @@ interface ExternalSessionTokenData {
 
 // this function creates a new vodka session token, used to authenticate users on vodka
 // a vodka session token only contains an email address
-export const signVodkaSessionToken = (data: VodkaSessionTokenData) => {
+export const signSessionToken = (data: SessionTokenData) => {
 	return jwt.sign(data, privateKey, { algorithm: "RS256" });
 };
 
 // this is used to add the signed session token to the redis whitelist
 // if the database is wiped, all users will be logged out
 // THIS WORKS FOR BOTH VODKA AND EXTERNAL SESSION TOKENS
-export const whitelistSessionToken = async (token: string) => {
+export const rememberSessionToken = async (token: string) => {
 	const tokenHash = hash(token);
 
 	const redisClient = await getRedisClient();
@@ -54,20 +56,20 @@ export const invalidateVodkaSessionToken = async (token: string) => {
 	const redisClient = await getRedisClient();
 	await redisClient.del(`session_${tokenHash}`);
 
-	const externalSessionTokensHash = await redisClient.sMembers(
+	const messageTokenHashes = await redisClient.sMembers(
 		`session_${tokenHash}_external`,
 	);
 
-	for (const externalSessionTokenHash of externalSessionTokensHash) {
-		await redisClient.del(`session_${externalSessionTokenHash}`);
+	for (const messageTokenHash of messageTokenHashes) {
+		await redisClient.del(`session_${messageTokenHash}`);
 	}
 };
 
 // this function verifies if a session token is signed AND whitelisted
-// THIS WORKS FOR BOTH VODKA AND EXTERNAL SESSION TOKENS
-export const decodeSessionToken = async (
+// THIS WORKS FOR BOTH SESSION TOKENS AND MESSAGE TOKENS
+export const decodeToken = async (
 	token: string,
-): Promise<VodkaSessionTokenData | ExternalSessionTokenData | false> => {
+): Promise<SessionTokenData | MessageTokenData | false> => {
 	const tokenHash = hash(token);
 
 	const redisClient = await getRedisClient();
@@ -79,31 +81,29 @@ export const decodeSessionToken = async (
 
 	try {
 		jwt.verify(token, publicKey);
-		return jwt.decode(token) as
-			| VodkaSessionTokenData
-			| ExternalSessionTokenData;
+		return jwt.decode(token) as SessionTokenData | MessageTokenData;
 	} catch (e) {
 		return false;
 	}
 };
 
-// this function creates a new external session token, used to authenticate users on external websites
+// this function creates a new message token, used to transfer data to external websites
 // this session token is a JWT and contains all the user data
-export const signExternalSessionToken = (data: ExternalSessionTokenData) => {
+export const signMessageToken = (data: MessageTokenData) => {
 	return jwt.sign(data, privateKey, { algorithm: "RS256" });
 };
 
-// this function links an external session token to a vodka session token
-// this is useful so when a user logs out of vodka, we can un-whitelist all the external session tokens
-export const linkExternalSessionTokenToVodkaSessionToken = async (
+// this function links an message token to a session token
+// this is useful so when a user logs out of vodka, we can un-whitelist all the message tokens
+export const linkMessageTokenToSessionToken = async (
 	vodkaSessionToken: string,
-	externalSessionToken: string,
+	messageToken: string,
 ) => {
 	const vodkaSessionTokenHash = hash(vodkaSessionToken);
 
 	const redisClient = await getRedisClient();
 	await redisClient.sAdd(
 		`session_${vodkaSessionTokenHash}_external`,
-		hash(externalSessionToken),
+		hash(messageToken),
 	);
 };

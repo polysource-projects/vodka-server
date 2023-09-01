@@ -72,7 +72,7 @@ POST /data?domain=www.google.com
 {
     "user": User,
     "website": Website,
-    "token": ExternalJWT
+    "token": MessageJWT
 }
 ```
 

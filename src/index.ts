@@ -14,13 +14,13 @@ import { generateRandomCode, hash } from "./util";
 import {
 	VodkaUserData,
 	WebsiteData,
-	decodeSessionToken,
+	decodeToken,
 	invalidateVodkaSessionToken,
-	linkExternalSessionTokenToVodkaSessionToken,
+	linkMessageTokenToSessionToken,
 	publicKey,
-	signExternalSessionToken,
-	signVodkaSessionToken,
-	whitelistSessionToken,
+	signMessageToken,
+	signSessionToken
+	rememberSessionToken
 } from "./session-tokens";
 
 import { readFileSync } from "fs";
@@ -96,22 +96,22 @@ server.post("/auth/answer", async (request, reply) => {
 		return void reply.code(400).send();
 	}
 
-	const cookieQuestionIdHash = hash(answer + questionId);
+	const answerHash = hash(answer + questionId);
 
 	const redisClient = await getRedisClient();
-	const email = await redisClient.get(cookieQuestionIdHash);
+	const email = await redisClient.get(answerHash);
 	if (!email || !email.endsWith("@epfl.ch")) {
 		return void reply.code(401).send();
 	}
 
-	const vodkaSessionToken = signVodkaSessionToken({
-		email,
-		tokenType: "vodka",
+	const sessionToken = signSessionToken({
+		sub: email,
+		type: "session",
 	});
 
-	await whitelistSessionToken(vodkaSessionToken);
+	await rememberSessionToken(sessionToken);
 
-	reply.setCookie("sessionId", vodkaSessionToken, {
+	reply.setCookie("sessionId", sessionToken, {
 		path: "/",
 		httpOnly: true,
 		sameSite: process.env.NODE_ENV === "development" ? "none" : "strict",
@@ -152,12 +152,12 @@ server.get("/data", async (request, reply) => {
 		return void reply.code(400).send();
 	}
 
-	const decodedSessionToken = await decodeSessionToken(sessionId);
-	if (!decodedSessionToken) {
+	const decodedToken = await decodeToken(sessionId);
+	if (!decodedToken || decodedToken.type !== "session") {
 		return void reply.code(401).send();
 	}
 
-	const email = decodedSessionToken.email;
+	const email = decodedToken.email;
 
 	// TODO: fetch data
 	const user: VodkaUserData = {
@@ -174,14 +174,14 @@ server.get("/data", async (request, reply) => {
 	if (domain) {
 		website = websites.find((w: any) => w.domain === domain) || null;
 
-		token = signExternalSessionToken({
+		token = signMessageToken({
 			sub: email,
 			target: domain,
 			user,
 		});
 
-		await whitelistSessionToken(token);
-		await linkExternalSessionTokenToVodkaSessionToken(sessionId, token);
+		await rememberSessionToken(token);
+		await linkMessageTokenToSessionToken(sessionId, token);
 	}
 
 	reply.send({
