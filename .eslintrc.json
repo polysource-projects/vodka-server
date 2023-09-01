@@ -19,5 +19,6 @@
 		"linebreak-style": ["error", "unix"],
 
 		"@typescript-eslint/no-explicit-any": "off"
-	}
+	},
+	"ignorePatterns": ["node_modules/", "dist/"]
 }

@@ -5,7 +5,7 @@ import nodemailer from "nodemailer";
 
 const mailTemplate = readFileSync(
 	path.join(__dirname, "../../assets/mail.html"),
-	"utf-8",
+	"utf-8"
 );
 
 const verificationMail = (code: string) =>
@@ -35,7 +35,12 @@ export class Mail {
 		return this.sendMail(
 			email,
 			`${code} is your Vodka verification code.`,
-			verificationMail(code),
+			verificationMail(code)
 		);
+	}
+
+	static validateAddress(email: string) {
+		const re = /\S+@\S+\.\S+/;
+		return re.test(email);
 	}
 }

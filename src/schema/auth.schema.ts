@@ -1,4 +1,3 @@
-import { FastifyRequest } from "fastify";
 import S from "fluent-json-schema";
 
 // Ask
@@ -23,7 +22,7 @@ export interface AnswerBody {
 export const answerSchema = {
 	body: S.object().prop(
 		"answer",
-		S.string().required().minLength(6).maxLength(6),
+		S.string().required().minLength(6).maxLength(6)
 	),
 	queryString: S.object(),
 	params: S.object(),

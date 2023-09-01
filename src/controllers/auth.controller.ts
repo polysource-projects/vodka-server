@@ -1,20 +1,13 @@
 import { AnswerBody, AskBody } from "../schema";
 import { Handler } from "../interfaces";
-import {
-	Redis,
-	validateEmail,
-	Mail,
-	generateVerificationCode,
-	generateQuestionId,
-	Keyring,
-} from "../helpers";
+import { Redis, Mail, Keyring } from "../helpers";
 
 export const ask: Handler<AskBody> = async (request, reply) => {
 	const { email } = request.body;
 
 	//! Check that email is a valid email, then check it is an EPFL email
 
-	const isValid = validateEmail(email);
+	const isValid = Mail.validateAddress(email);
 	const isEPFL = isValid && email.endsWith("@epfl.ch");
 
 	if (!isValid) {
@@ -37,8 +30,8 @@ export const ask: Handler<AskBody> = async (request, reply) => {
 
 	//! Generate confirmation code and assign question ID
 
-	const verificationCode = await generateVerificationCode();
-	const questionId = generateQuestionId();
+	const verificationCode = await Keyring.generateVerificationCode();
+	const questionId = Keyring.generateQuestionId();
 
 	// Store solution hash
 	await Redis.saveQuestion(email, questionId, verificationCode);
@@ -58,7 +51,7 @@ export const ask: Handler<AskBody> = async (request, reply) => {
 };
 
 export const answer: Handler<AnswerBody> = async (request, reply) => {
-	const questionId = request.cookies?.questionId;
+	const questionId = request.cookies.questionId;
 	const answer = request.body.answer;
 
 	if (!questionId) {
@@ -85,7 +78,7 @@ export const answer: Handler<AnswerBody> = async (request, reply) => {
 };
 
 export const logout: Handler = async (request, reply) => {
-	const sessionId = request.cookies?.sessionId;
+	const sessionId = request.cookies.sessionId;
 
 	if (!sessionId) {
 		return void reply.code(401).send();

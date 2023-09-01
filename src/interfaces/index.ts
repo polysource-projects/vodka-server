@@ -18,10 +18,16 @@ export type Handler<
 	Body = unknown,
 	Headers = unknown,
 	Params = unknown,
-	Querystring = unknown,
+	Querystring = unknown
 > = RouteHandlerMethod<
 	RawServerDefault,
 	RawRequestDefaultExpression<RawServerDefault>,
 	RawReplyDefaultExpression<RawServerDefault>,
 	Request<Body, Headers, Params, Querystring>
 >;
+
+export interface User {
+	email: string;
+	firstName?: string;
+	lastName?: string;
+}

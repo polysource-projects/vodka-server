@@ -1,5 +1,7 @@
 import { createClient } from "redis";
-import { hash } from "../helpers";
+import { Keyring } from "./keyring";
+
+const { hash } = Keyring;
 
 const client = createClient({
 	url: process.env.REDIS_URL,
