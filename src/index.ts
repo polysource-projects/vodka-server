@@ -17,6 +17,7 @@ import {
 	decodeSessionToken,
 	invalidateVodkaSessionToken,
 	linkExternalSessionTokenToVodkaSessionToken,
+	publicKey,
 	signExternalSessionToken,
 	signVodkaSessionToken,
 	whitelistSessionToken,
@@ -187,6 +188,12 @@ server.get("/data", async (request, reply) => {
 		website,
 		token
 	});
+});
+
+server.get('/public-key', async (request, reply) => {
+
+	reply.send(publicKey);
+
 });
 
 server.listen(
