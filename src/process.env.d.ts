@@ -6,5 +6,7 @@ declare namespace NodeJS {
 		SMTP_SERVER_PORT: number;
 		REDIS_URL: string;
 		COOKIE_SECRET: string;
+		JWT_PUBLIC_KEY: string;
+		JWT_PRIVATE_KEY: string;
 	}
 }

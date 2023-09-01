@@ -19,6 +19,9 @@ COPY . .
 # Build the app
 RUN pnpm run build
 
+# Load keys from env
+RUN node scripts/load-keys.cjs
+
 # Expose the port
 EXPOSE 3000
 
