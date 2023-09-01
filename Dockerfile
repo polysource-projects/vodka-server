@@ -19,6 +19,9 @@ COPY . .
 # Build the app
 RUN pnpm run build
 
+ARG JWT_PRIVATE_KEY=${JWT_PRIVATE_KEY}
+ARG JWT_PUBLIC_KEY=${JWT_PUBLIC_KEY}
+
 # Load keys from env
 RUN node scripts/load-keys.cjs
 
