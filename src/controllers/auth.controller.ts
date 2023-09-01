@@ -3,7 +3,11 @@ import { Handler } from "../interfaces";
 import { Redis, Mail, Keyring } from "../helpers";
 
 export const ask: Handler<AskBody> = async (request, reply) => {
-	const { email } = request.body;
+	const email = request.body?.email;
+
+	if (!email) {
+		return void reply.code(400).send();
+	}
 
 	//! Check that email is a valid email, then check it is an EPFL email
 
@@ -58,7 +62,7 @@ export const answer: Handler<AnswerBody> = async (request, reply) => {
 		return void reply.code(400).send();
 	}
 
-	const email = await Redis.checkAnswer(answer, questionId);
+	const email = await Redis.checkAnswer(questionId, answer);
 
 	if (!email) {
 		return void reply.code(401).send();
@@ -86,5 +90,13 @@ export const logout: Handler = async (request, reply) => {
 
 	await Redis.deleteSession(sessionId);
 
-	reply.clearCookie("sessionId").code(200).send("OK");
+	reply
+		.clearCookie("sessionId", {
+			path: "/",
+			httpOnly: true,
+			secure: true,
+			sameSite: process.env.NODE_ENV === "development" ? "none" : "strict",
+		})
+		.code(200)
+		.send("OK");
 };

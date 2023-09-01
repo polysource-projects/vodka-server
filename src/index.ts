@@ -6,6 +6,9 @@ import type { FastifyCookieOptions } from "@fastify/cookie";
 import cookie from "@fastify/cookie";
 import cors from "@fastify/cors";
 
+import authRouter from "./routes/auth.router";
+import infoRouter from "./routes/info.router";
+
 import { publicKey } from "./helpers/keyring";
 
 // We can afford to block the event loop here as it's only done once at startup
@@ -23,6 +26,11 @@ server.register(cors, {
 	origin: true,
 	credentials: true,
 });
+
+// Serve routes
+
+server.register(infoRouter, { prefix: "/data" });
+server.register(authRouter, { prefix: "/auth" });
 
 // Serve public key
 
@@ -43,5 +51,5 @@ server.listen(
 			process.exit(1);
 		}
 		console.log(`Server listening at ${address}`);
-	}
+	},
 );

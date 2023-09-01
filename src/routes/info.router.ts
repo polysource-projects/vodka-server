@@ -8,6 +8,6 @@ export default async function authRouter(fastify: FastifyInstance) {
 		method: "GET",
 		url: "/",
 		schema: infoSchema,
-		handler: controllers.ask,
+		handler: controllers.info,
 	});
 }

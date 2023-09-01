@@ -7,7 +7,6 @@ export interface InfoQuery {
 }
 
 export const infoSchema = {
-	body: S.object(),
 	queryString: S.object().prop("domain", S.string()),
 	params: S.object(),
 	headers: S.object(),

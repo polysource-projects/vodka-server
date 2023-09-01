@@ -2,17 +2,17 @@ import path from "path";
 import crypto from "crypto";
 import { readFileSync } from "fs";
 
-import jwt from "jsonwebtoken";
+import jwt, { SignOptions } from "jsonwebtoken";
 import { Redis } from "./redis";
 import { User } from "../interfaces";
 
 export const privateKey = readFileSync(
 	path.join(__dirname, "../../keys/vodka.key"),
-	"utf-8"
+	"utf-8",
 );
 export const publicKey = readFileSync(
 	path.join(__dirname, "../../keys/vodka.key.pub"),
-	"utf-8"
+	"utf-8",
 );
 
 interface SessionTokenPayload {
@@ -25,8 +25,12 @@ interface SessionTokenPayload {
 export class Keyring {
 	//! JWT Things
 
-	private static signJWT(data: object) {
-		return jwt.sign(data, privateKey, { algorithm: "RS256" });
+	private static signJWT(data: object, expiresIn?: string | number) {
+		const params: SignOptions = {
+			algorithm: "RS256",
+		};
+		if (expiresIn !== undefined) params.expiresIn = expiresIn;
+		return jwt.sign(data, privateKey, params);
 	}
 
 	private static readJWT(token: string) {
@@ -38,11 +42,13 @@ export class Keyring {
 	}
 
 	static async createSession(email: string) {
-		const token = this.signJWT({
-			sub: email,
-			type: "session",
-			exp: "7d",
-		});
+		const token = this.signJWT(
+			{
+				sub: email,
+				type: "session",
+			},
+			"7d",
+		);
 
 		await Redis.saveSession(token);
 

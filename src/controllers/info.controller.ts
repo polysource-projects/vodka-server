@@ -4,8 +4,9 @@ import { Keyring, Websites } from "../helpers";
 
 export const info: Handler<unknown, unknown, unknown, InfoQuery> = async (
 	request,
-	reply
+	reply,
 ) => {
+	console.log("hi");
 	const sessionId = request.cookies.sessionId;
 
 	if (!sessionId) {
@@ -31,10 +32,8 @@ export const info: Handler<unknown, unknown, unknown, InfoQuery> = async (
 
 		const paperplane = Keyring.signPaperplane(user, domain);
 
-		reply.send({ user, website, paperplane });
+		reply.send({ user, website, token: paperplane });
 	} else {
 		reply.send({ user, website: null, token: null });
 	}
-
-	reply.code(201).send("OK");
 };
