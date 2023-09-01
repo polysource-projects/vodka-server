@@ -19,8 +19,8 @@ import {
 	linkMessageTokenToSessionToken,
 	publicKey,
 	signMessageToken,
-	signSessionToken
-	rememberSessionToken
+	signSessionToken,
+	rememberSessionToken,
 } from "./session-tokens";
 
 import { readFileSync } from "fs";
