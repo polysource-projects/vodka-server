@@ -15,19 +15,11 @@ export const ask: Handler<AskBody> = async (request, reply) => {
 	const isEPFL = isValid && email.endsWith("@epfl.ch");
 
 	if (!isValid) {
-		return void reply
-			.code(400)
-			.send
-			// { message: "Invalid email" }
-			();
+		return void reply.code(400).send({ message: "Invalid email" });
 	}
 
 	if (!isEPFL) {
-		return void reply
-			.code(400)
-			.send
-			// { message: "Not an EPFL email" }
-			();
+		return void reply.code(400).send({ message: "Not an EPFL email" });
 	}
 
 	//TODO Manage ratelimits
