@@ -41,6 +41,8 @@ export class Keyring {
 		}
 	}
 
+	//! Session things
+
 	static async createSession(email: string) {
 		const token = this.signJWT(
 			{
@@ -70,6 +72,8 @@ export class Keyring {
 		return payload;
 	}
 
+	//! Paperplane things
+
 	// Here, a paperplane is the piece of data that's sent over to the 3rd-party website
 	static signPaperplane(user: User, domain: string) {
 		const token = this.signJWT({
@@ -79,6 +83,8 @@ export class Keyring {
 		});
 		return token;
 	}
+
+	//! Util
 
 	/**
 	 * @returns a 6-digit verification code

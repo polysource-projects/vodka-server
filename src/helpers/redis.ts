@@ -14,6 +14,8 @@ const connectPromise = client.connect();
 export const getRedisClient = () => connectPromise.then(() => client);
 
 export class Redis {
+	//! Auth things
+
 	static async saveQuestion(email: string, questionId: string, answer: string) {
 		const client = await getRedisClient();
 		const solution = hash("question_" + questionId + "." + answer);
@@ -26,6 +28,8 @@ export class Redis {
 		const email = await client.get(solution);
 		return email;
 	}
+
+	//! Session things
 
 	static async saveSession(token: string) {
 		const client = await getRedisClient();
