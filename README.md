@@ -16,13 +16,13 @@ POST /auth/ask
 }
 ```
 
-#### Request - 201 OK
+#### Response - 201 OK
 
 ```http
 Set-Cookie: questionId
 ```
 
-```json
+```
 OK
 ```
 
@@ -40,13 +40,13 @@ POST /auth/answer
 }
 ```
 
-#### Request - 200 OK
+#### Response - 200 OK
 
 ```http
 Set-Cookie: sessionId
 ```
 
-```json
+```
 OK
 ```
 
@@ -58,23 +58,21 @@ OK
 POST /data?domain=www.google.com
 ```
 
-```json
-
-```
-
-#### Request - 200 OK
-
-```http
-
-```
+#### Response - 200 OK
 
 ```json
 {
-    "user": User,
-    "website": Website,
-    "token": MessageJWT
+	"user": {
+		"email": "john.doe@epfl.ch"
+	},
+	"website": {
+		"name": "Google",
+		"domain": "www.google.com"
+	},
+	"token": "xxx.yyy.zzz"
 }
 ```
+`website` and `token` are only non-null if `domain` is registered as a verified website.
 
 ### D - Logout FROM VODKA
 
@@ -84,17 +82,13 @@ POST /data?domain=www.google.com
 POST /auth/logout
 ```
 
-```json
-
-```
-
-#### Request - 200 OK
+#### Response - 200 OK
 
 ```http
-
+Set-Cookie: sessionId; MaxAge=-1
 ```
 
-```json
+```
 OK
 ```
 
@@ -106,17 +100,10 @@ OK
 GET /public-key
 ```
 
-```json
+#### Response - 200 OK
 
-```
 
-#### Request - 200 OK
-
-```http
-
-```
-
-```json
+```txt
 -----BEGIN PUBLIC KEY-----
 MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAxtpolRhOgtz05Ylj9CU4
 st3VC2BcsbeiHcv/DhOLWzaLGBi3sS+ZZS7GUHhhKDgZ6sgFoABV+dMOGGjJJ9y1
