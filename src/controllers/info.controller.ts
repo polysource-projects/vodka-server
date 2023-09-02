@@ -4,9 +4,8 @@ import { Keyring, Websites } from "../helpers";
 
 export const info: Handler<unknown, unknown, unknown, InfoQuery> = async (
 	request,
-	reply
+	reply,
 ) => {
-	console.log("hi");
 	const sessionId = request.cookies.sessionId;
 
 	if (!sessionId) {
