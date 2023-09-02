@@ -25,14 +25,14 @@ export const ask: Handler<AskBody> = async (request, reply) => {
 	//TODO Manage ratelimits
 
 	//! Generate confirmation code and assign question ID
-
 	const verificationCode = await Keyring.generateVerificationCode();
 	const questionId = Keyring.generateQuestionId();
 
 	// Store solution hash
 	await Redis.saveQuestion(email, questionId, verificationCode);
 	// Send verification code
-	await Mail.sendConfirmationCode(email, verificationCode);
+	// Do not await, send mail in background : this may take in the order of a second
+	Mail.sendConfirmationCode(email, verificationCode);
 
 	// Send response with Question cookie
 	reply.setCookie("questionId", questionId, {
