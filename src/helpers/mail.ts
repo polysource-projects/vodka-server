@@ -24,7 +24,7 @@ const transporter = nodemailer.createTransport({
 export class Mail {
 	private static sendMail(to: string, subject: string, body: string) {
 		return transporter.sendMail({
-			from: '"EPFL Vodka" <contact@epfl.tools>',
+			from: `"EPFL Vodka" <${process.env.SMTP_USERNAME}>`,
 			to,
 			subject,
 			html: body,
